@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LitFeed — Huck Finn</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #161616;
+            --bg-tertiary: #1e1e1e;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1a1;
+            --text-muted: #666;
+            --accent: #e85d75;
+            --accent-glow: rgba(232, 93, 117, 0.3);
+            --accent-blue: #667eea;
+            --border: #2a2a2a;
+            --gradient-1: linear-gradient(135deg, #e85d75 0%, #ff8a5c 50%, #ffd93d 100%);
+            --gradient-river: linear-gradient(135deg, #1a4a5e 0%, #2d5a4a 50%, #1a3a4a 100%);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-full: 50%;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .app {
+            max-width: 520px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--bg-primary);
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .logo {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 26px;
+            font-style: italic;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .header-btn {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: var(--radius-sm);
+            transition: background 0.2s;
+        }
+
+        .header-btn:hover { background: var(--bg-tertiary); }
+
+        /* Section Selector */
+        .section-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .section-dropdown {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 6px 12px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .section-dropdown:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* Assignment Banner */
+        .assignment-banner {
+            background: var(--gradient-river);
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .assignment-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 4px;
+        }
+
+        .assignment-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: 18px;
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+
+        .assignment-prompt {
+            font-size: 13px;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.5;
+        }
+
+        /* Stories Bar */
+        .stories-bar {
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .stories-bar::-webkit-scrollbar { display: none; }
+
+        .stories-container {
+            display: flex;
+            gap: 14px;
+            padding: 0 16px;
+        }
+
+        .story-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .story-ring {
+            width: 64px;
+            height: 64px;
+            border-radius: var(--radius-full);
+            padding: 3px;
+            background: var(--gradient-1);
+            transition: transform 0.2s;
+        }
+
+        .story-ring.viewed { background: var(--border); }
+
+        .story-item:hover .story-ring { transform: scale(1.05); }
+
+        .story-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: var(--radius-full);
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            border: 3px solid var(--bg-primary);
+        }
+
+        .story-name {
+            font-size: 10px;
+            color: var(--text-secondary);
+            max-width: 64px;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .filter-tabs::-webkit-scrollbar { display: none; }
+
+        .filter-tab {
+            padding: 7px 14px;
+            border-radius: 18px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .filter-tab:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .filter-tab.active {
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            border-color: var(--text-primary);
+        }
+
+        /* Feed */
+        .feed { padding-bottom: 90px; }
+
+        /* Post */
+        .post { border-bottom: 1px solid var(--border); }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+        }
+
+        .post-author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .post-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: var(--radius-full);
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .post-author-name {
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .post-location {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .post-section-badge {
+            font-size: 10px;
+            color: var(--accent-blue);
+            background: rgba(102, 126, 234, 0.15);
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+        }
+
+        .post-menu {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* Post Media */
+        .post-media {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            background: var(--bg-secondary);
+            overflow: hidden;
+        }
+
+        .post-media img, .post-media video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .post-media-text {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 32px;
+            text-align: center;
+            background: var(--gradient-river);
+        }
+
+        .post-media-text blockquote {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 22px;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        .post-media-video-indicator {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.6);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .like-burst {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-size: 70px;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .like-burst.animate {
+            animation: likeBurst 0.7s ease-out forwards;
+        }
+
+        @keyframes likeBurst {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.3); opacity: 0; }
+        }
+
+        /* Post Actions */
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 16px;
+        }
+
+        .post-actions-left { display: flex; gap: 14px; }
+
+        .action-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .action-btn:hover { transform: scale(1.1); }
+        .action-btn:active { transform: scale(0.9); }
+
+        .post-stats {
+            padding: 0 16px;
+            font-size: 13px;
+        }
+
+        .post-likes {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .post-caption {
+            padding: 0 16px 6px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .post-caption strong { font-weight: 600; margin-right: 4px; }
+        .hashtag { color: #8bb4e0; }
+
+        .post-comments-preview { padding: 0 16px 6px; }
+
+        .view-comments {
+            color: var(--text-muted);
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .post-time {
+            padding: 0 16px 14px;
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 520px;
+            background: rgba(10, 10, 10, 0.97);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0 26px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 8px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .nav-btn:hover, .nav-btn.active { opacity: 1; }
+
+        /* Views */
+        .view-container { display: none; }
+        .view-container.active { display: block; }
+
+        /* Profile */
+        .profile-header { padding: 20px 16px; }
+
+        .profile-back {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 20px;
+            cursor: pointer;
+            margin-bottom: 12px;
+        }
+
+        .profile-top {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 16px;
+        }
+
+        .profile-avatar-large {
+            width: 80px;
+            height: 80px;
+            border-radius: var(--radius-full);
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .profile-stat { text-align: center; }
+        .profile-stat-num { font-size: 17px; font-weight: 700; }
+        .profile-stat-label { font-size: 11px; color: var(--text-secondary); }
+
+        .profile-name { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+        .profile-section { font-size: 12px; color: var(--accent-blue); margin-bottom: 8px; }
+        .profile-bio { font-size: 13px; color: var(--text-secondary); line-height: 1.4; margin-bottom: 12px; }
+
+        .profile-theme-tag {
+            display: inline-block;
+            padding: 5px 12px;
+            background: var(--bg-tertiary);
+            border-radius: 16px;
+            font-size: 12px;
+            color: var(--accent);
+        }
+
+        .profile-members {
+            margin-top: 12px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            padding-bottom: 90px;
+        }
+
+        .grid-item {
+            aspect-ratio: 1;
+            background: var(--bg-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .grid-item-text {
+            font-family: 'Instrument Serif', serif;
+            font-size: 11px;
+            font-style: italic;
+            padding: 8px;
+            text-align: center;
+            background: var(--gradient-river);
+        }
+
+        /* Dashboard */
+        .dashboard { padding: 16px; padding-bottom: 100px; }
+
+        .dashboard-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: 24px;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .stat-card h3 {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .stat-card .big-num { font-size: 28px; font-weight: 700; }
+        .stat-card .change { font-size: 11px; color: #4ade80; }
+
+        .dashboard-section {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .dashboard-section h3 { font-size: 14px; margin-bottom: 12px; }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .leaderboard-item:last-child { border-bottom: none; }
+
+        .leaderboard-rank {
+            width: 24px;
+            height: 24px;
+            border-radius: var(--radius-full);
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 11px;
+        }
+
+        .leaderboard-rank.gold { background: linear-gradient(135deg, #ffd700, #ffb700); color: #000; }
+        .leaderboard-rank.silver { background: linear-gradient(135deg, #c0c0c0, #a0a0a0); color: #000; }
+        .leaderboard-rank.bronze { background: linear-gradient(135deg, #cd7f32, #b87333); color: #000; }
+
+        .leaderboard-avatar { font-size: 20px; }
+        .leaderboard-info { flex: 1; }
+        .leaderboard-name { font-weight: 600; font-size: 13px; }
+        .leaderboard-stat { font-size: 11px; color: var(--text-secondary); }
+
+        .pending-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .pending-item:last-child { border-bottom: none; }
+
+        .pending-preview {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .pending-info { flex: 1; }
+        .pending-group { font-weight: 600; font-size: 13px; }
+        .pending-type { font-size: 11px; color: var(--text-secondary); }
+        .pending-actions { display: flex; gap: 8px; }
+
+        .pending-btn {
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            border: none;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .pending-btn.approve { background: #4ade80; color: #000; }
+        .pending-btn.review { background: var(--bg-tertiary); color: var(--text-primary); }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            max-width: 400px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-title { font-weight: 600; font-size: 15px; }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        .modal-content { padding: 16px; }
+
+        .comment-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .comment-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-full);
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .comment-body { flex: 1; }
+        .comment-author { font-weight: 600; font-size: 12px; margin-right: 4px; }
+        .comment-text { font-size: 12px; line-height: 1.4; }
+        .comment-time { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+
+        .comment-input-wrap {
+            display: flex;
+            gap: 10px;
+            padding: 14px 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .comment-input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 13px;
+            outline: none;
+        }
+
+        .comment-input::placeholder { color: var(--text-muted); }
+
+        .comment-submit {
+            background: none;
+            border: none;
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        /* Empty State */
+        .empty-state {
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .empty-state-icon { font-size: 48px; margin-bottom: 16px; }
+        .empty-state-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+        .empty-state-text { font-size: 14px; color: var(--text-secondary); }
+
+        @media (min-width: 521px) {
+            .app {
+                border-left: 1px solid var(--border);
+                border-right: 1px solid var(--border);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-top">
+                <div>
+                    <div class="logo">LitFeed</div>
+                    <div class="header-subtitle">Adventures of Huckleberry Finn</div>
+                </div>
+                <div class="header-actions">
+                    <button class="header-btn" onclick="showDashboard()" title="Teacher Dashboard">👩‍🏫</button>
+                    <button class="header-btn" onclick="showSubmitInfo()" title="Submit Content">➕</button>
+                </div>
+            </div>
+            <div class="section-selector">
+                <span class="section-label">Viewing:</span>
+                <select class="section-dropdown" id="sectionSelect" onchange="filterBySection()">
+                    <option value="all">🌟 Trending (All Sections)</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- Feed View -->
+        <main class="view-container active" id="feedView">
+            <div class="assignment-banner">
+                <div class="assignment-label">Current Assignment</div>
+                <div class="assignment-title">Ch 1-4: The Weight of a Word</div>
+                <div class="assignment-prompt">
+                    Reflect on Twain's use of the n-word. Can it be changed without loss? Apply Gloria Naylor's concept—how do words acquire power between speaker and listener?
+                </div>
+            </div>
+
+            <div class="stories-bar">
+                <div class="stories-container" id="storiesContainer"></div>
+            </div>
+
+            <div class="filter-tabs" id="filterTabs">
+                <button class="filter-tab active" data-filter="all">All</button>
+                <button class="filter-tab" data-filter="language">#language</button>
+                <button class="filter-tab" data-filter="naylor">#naylor</button>
+                <button class="filter-tab" data-filter="debate">#debate</button>
+                <button class="filter-tab" data-filter="jim">#jim</button>
+                <button class="filter-tab" data-filter="context">#context</button>
+            </div>
+
+            <div class="feed" id="postsContainer"></div>
+        </main>
+
+        <!-- Profile View -->
+        <div class="view-container" id="profileView">
+            <div class="profile-header" id="profileHeader"></div>
+            <div class="profile-grid" id="profileGrid"></div>
+        </div>
+
+        <!-- Dashboard View -->
+        <div class="view-container" id="dashboardView">
+            <div class="dashboard">
+                <h2 class="dashboard-title">Teacher Dashboard</h2>
+                
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <h3>Total Posts</h3>
+                        <div class="big-num" id="statPosts">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Engagement</h3>
+                        <div class="big-num" id="statEngagement">0</div>
+                        <div class="change">↑ this week</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Active Groups</h3>
+                        <div class="big-num" id="statGroups">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Pending</h3>
+                        <div class="big-num" id="statPending">0</div>
+                    </div>
+                </div>
+
+                <div class="dashboard-section">
+                    <h3>⏳ Pending Approval</h3>
+                    <div id="pendingList"></div>
+                </div>
+
+                <div class="dashboard-section">
+                    <h3>🏆 Top Groups</h3>
+                    <div id="leaderboard"></div>
+                </div>
+
+                <div class="dashboard-section">
+                    <h3>📊 By Section</h3>
+                    <div id="sectionStats"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Nav -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" onclick="showFeed()">🏠</button>
+            <button class="nav-btn" onclick="showSubmitInfo()">➕</button>
+            <button class="nav-btn" onclick="showDashboard()">📊</button>
+            <button class="nav-btn" onclick="showAllGroups()">👥</button>
+        </nav>
+    </div>
+
+    <!-- Comments Modal -->
+    <div class="modal-overlay" id="commentsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">Comments</span>
+                <button class="modal-close" onclick="closeModal('commentsModal')">✕</button>
+            </div>
+            <div class="modal-content" id="commentsContent"></div>
+            <div class="comment-input-wrap">
+                <input type="text" class="comment-input" placeholder="Add a comment...">
+                <button class="comment-submit">Post</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Modal -->
+    <div class="modal-overlay" id="submitModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">Submit Content</span>
+                <button class="modal-close" onclick="closeModal('submitModal')">✕</button>
+            </div>
+            <div class="modal-content">
+                <p style="margin-bottom: 16px; line-height: 1.6;">To submit content for LitFeed:</p>
+                <ol style="margin-left: 20px; line-height: 2; color: var(--text-secondary);">
+                    <li>Upload your content to the class Google Drive</li>
+                    <li>Fill out the submission form (link in Canvas)</li>
+                    <li>Your teacher will review</li>
+                    <li>Once approved, your post goes live!</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- Groups Modal -->
+    <div class="modal-overlay" id="groupsModal">
+        <div class="modal" style="max-height: 90vh;">
+            <div class="modal-header">
+                <span class="modal-title">All Groups</span>
+                <button class="modal-close" onclick="closeModal('groupsModal')">✕</button>
+            </div>
+            <div class="modal-content" id="groupsListContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // =====================================================
+        // SAMPLE DATA - Replace with your Google Sheet data
+        // =====================================================
+
+        const SECTIONS = [
+            { id: "SEC001", name: "Period 1 - Smith", teacher: "Ms. Smith" },
+            { id: "SEC002", name: "Period 2 - Smith", teacher: "Ms. Smith" },
+            { id: "SEC003", name: "Period 3 - Smith", teacher: "Ms. Smith" },
+            { id: "SEC004", name: "Period 4 - Smith", teacher: "Ms. Smith" },
+            { id: "SEC005", name: "Period 1 - Johnson", teacher: "Mr. Johnson" },
+            { id: "SEC006", name: "Period 2 - Johnson", teacher: "Mr. Johnson" },
+            { id: "SEC007", name: "Period 3 - Johnson", teacher: "Mr. Johnson" },
+            { id: "SEC008", name: "Period 4 - Johnson", teacher: "Mr. Johnson" },
+            { id: "SEC009", name: "Period 5 - Davis", teacher: "Ms. Davis" },
+            { id: "SEC010", name: "Period 6 - Davis", teacher: "Ms. Davis" },
+            { id: "SEC011", name: "Period 5 - Garcia", teacher: "Mr. Garcia" },
+            { id: "SEC012", name: "Period 6 - Garcia", teacher: "Mr. Garcia" },
+        ];
+
+        const GROUPS = [
+            { id: "GRP001", name: "The River Rats", avatar: "🚣", sectionId: "SEC001", theme: "Freedom & Escape", members: ["Alex M.", "Jordan T.", "Sam K."], bio: "Exploring how the river represents freedom and escape from 'sivilization'" },
+            { id: "GRP002", name: "Word Police", avatar: "🔍", sectionId: "SEC001", theme: "Language & Power", members: ["Casey R.", "Morgan P.", "Riley S.", "Drew W."], bio: "Investigating Twain's deliberate word choices" },
+            { id: "GRP003", name: "The Raft Drifters", avatar: "🌊", sectionId: "SEC002", theme: "Social Commentary", members: ["Quinn L.", "Sage M.", "Avery N."], bio: "Analyzing Twain's satirical critique of society" },
+            { id: "GRP004", name: "Huck's Conscience", avatar: "💭", sectionId: "SEC002", theme: "Moral Development", members: ["Blake O.", "Charlie P.", "Jamie Q.", "Pat R."], bio: "Tracking Huck's moral growth" },
+            { id: "GRP005", name: "Mississippi Scholars", avatar: "📜", sectionId: "SEC003", theme: "Historical Context", members: ["Taylor B.", "Jordan C.", "Alex D."], bio: "Grounding the text in its historical moment" },
+            { id: "GRP006", name: "Voice Detectives", avatar: "🎭", sectionId: "SEC003", theme: "Dialect & Voice", members: ["Morgan E.", "Casey F.", "Riley G."], bio: "How dialect shapes character and meaning" },
+            { id: "GRP007", name: "The Satirists", avatar: "🎪", sectionId: "SEC005", theme: "Satire & Irony", members: ["Quinn H.", "Sage I.", "Avery J."], bio: "Unpacking Twain's satirical techniques" },
+            { id: "GRP008", name: "Freedom Riders", avatar: "⛵", sectionId: "SEC005", theme: "Freedom & Bondage", members: ["Blake K.", "Charlie L.", "Jamie M."], bio: "The paradox of freedom in slave territory" },
+        ];
+
+        const POSTS = [
+            {
+                id: "POST001", groupId: "GRP001", sectionId: "SEC001",
+                type: "video", thumbnailEmoji: "🎬",
+                caption: "We debated whether the NewSouth edition's changes protect readers or rob them of confronting history. Split decision—watch to see both sides.",
+                hashtags: ["chapters1-4", "language", "debate", "nword"],
+                likes: 47, views: 183, approved: true, featured: true,
+                comments: [
+                    { groupId: "GRP002", text: "The split-screen format is genius.", time: "2h" },
+                    { groupId: "GRP003", text: "Made us think twice about our position.", time: "1h" }
+                ],
+                createdAt: "2025-01-06T10:30:00Z"
+            },
+            {
+                id: "POST002", groupId: "GRP002", sectionId: "SEC001",
+                type: "image", thumbnailEmoji: "📊",
+                caption: "Word frequency analysis: Twain uses the n-word 219 times. We mapped WHERE—the pattern reveals whose voices dominate each chapter.",
+                hashtags: ["chapters1-4", "language", "data", "analysis"],
+                likes: 38, views: 142, approved: true, featured: true,
+                comments: [
+                    { groupId: "GRP001", text: "219 times! How did you count that?", time: "4h" },
+                    { groupId: "GRP005", text: "Break it down by speaker next!", time: "3h" }
+                ],
+                createdAt: "2025-01-06T11:15:00Z"
+            },
+            {
+                id: "POST003", groupId: "GRP003", sectionId: "SEC002",
+                type: "text",
+                quote: "Naylor says words get power from 'consensus' between speaker and listener. When Twain puts the n-word in Jim's mouth vs. Pap's—is it the same word?",
+                caption: "This question broke our group. Is context everything, or does the word carry weight regardless?",
+                hashtags: ["chapters1-4", "naylor", "context", "jim"],
+                likes: 62, views: 234, approved: true, featured: true,
+                comments: [
+                    { groupId: "GRP004", text: "THE question. Naylor would say the social agreement changes everything.", time: "6h" },
+                    { groupId: "GRP006", text: "HOW it's said matters too. Dialect shifts meaning.", time: "5h" },
+                    { groupId: "GRP001", text: "Referencing this in our next post. Credit coming.", time: "2h" }
+                ],
+                createdAt: "2025-01-06T14:00:00Z"
+            },
+            {
+                id: "POST004", groupId: "GRP004", sectionId: "SEC002",
+                type: "video", thumbnailEmoji: "🎤",
+                caption: "Dramatic reading: same passage THREE ways. Original. NewSouth 'slave' edition. Bleeped. Which makes you most uncomfortable? That discomfort is the point.",
+                hashtags: ["chapters1-4", "reading", "comparison", "discomfort"],
+                likes: 54, views: 198, approved: true, featured: false,
+                comments: [
+                    { groupId: "GRP003", text: "The bleeped version hit different. You fill the blank yourself.", time: "3h" },
+                    { groupId: "GRP007", text: "Show this to the whole grade.", time: "2h" }
+                ],
+                createdAt: "2025-01-06T15:30:00Z"
+            },
+            {
+                id: "POST005", groupId: "GRP005", sectionId: "SEC003",
+                type: "text",
+                quote: "1884. Twain publishes 19 years after the Civil War. His readers LIVED this. The word wasn't historical—it was present tense.",
+                caption: "Context check: Twain's audience had different ears. What did it mean to confront THEM with it?",
+                hashtags: ["chapters1-4", "context", "history", "audience"],
+                likes: 41, views: 156, approved: true, featured: false,
+                comments: [
+                    { groupId: "GRP003", text: "Changes how we think about 'intention.' He was provoking HIS readers.", time: "4h" }
+                ],
+                createdAt: "2025-01-05T09:20:00Z"
+            },
+            {
+                id: "POST006", groupId: "GRP006", sectionId: "SEC003",
+                type: "image", thumbnailEmoji: "🗣️",
+                caption: "Jim's dialect vs. Huck's—Jim drops more g's, different grammar. But when Jim speaks seriously, his speech changes. Twain gives him code-switching.",
+                hashtags: ["chapters1-4", "language", "jim", "dialect"],
+                likes: 35, views: 129, approved: true, featured: false,
+                comments: [
+                    { groupId: "GRP002", text: "Code-switching in 1884! Twain knew.", time: "5h" }
+                ],
+                createdAt: "2025-01-05T11:00:00Z"
+            },
+            {
+                id: "POST007", groupId: "GRP007", sectionId: "SEC005",
+                type: "text",
+                quote: "NewSouth tries to make Twain 'safe.' But Twain wasn't trying to be safe. He wanted white readers uncomfortable. Removing the word removes the mirror.",
+                caption: "The discomfort IS the point. Taking away the cringe takes away the lesson.",
+                hashtags: ["chapters1-4", "debate", "nword", "satire"],
+                likes: 58, views: 212, approved: true, featured: true,
+                comments: [
+                    { groupId: "GRP001", text: "REMOVING THE MIRROR. Can we use this?", time: "1h" },
+                    { groupId: "GRP004", text: "But what about Black students reading it in class?", time: "45m" }
+                ],
+                createdAt: "2025-01-06T16:00:00Z"
+            },
+            {
+                id: "POST008", groupId: "GRP008", sectionId: "SEC005",
+                type: "video", thumbnailEmoji: "⚖️",
+                caption: "We interviewed 10 students about reading the n-word in class. The responses were... not what we expected.",
+                hashtags: ["chapters1-4", "nword", "interview", "perspective"],
+                likes: 0, views: 0, approved: false, featured: false,
+                comments: [],
+                createdAt: "2025-01-06T17:00:00Z",
+                feedback: "Add content warnings and get written permission from interviewees."
+            }
+        ];
+
+        // =====================================================
+        // STATE
+        // =====================================================
+        let currentSection = 'all';
+        let currentFilter = 'all';
+        let likedPosts = new Set();
+
+        // =====================================================
+        // HELPERS
+        // =====================================================
+        const getGroup = id => GROUPS.find(g => g.id === id);
+        const getSection = id => SECTIONS.find(s => s.id === id);
+        const formatNum = n => n >= 1000 ? (n/1000).toFixed(1) + 'k' : n.toString();
+
+        function getTimeAgo(date) {
+            const diff = Date.now() - new Date(date).getTime();
+            const mins = Math.floor(diff / 60000);
+            const hrs = Math.floor(mins / 60);
+            const days = Math.floor(hrs / 24);
+            if (days > 0) return `${days}d`;
+            if (hrs > 0) return `${hrs}h`;
+            if (mins > 0) return `${mins}m`;
+            return 'now';
+        }
+
+        // =====================================================
+        // RENDER
+        // =====================================================
+        function init() {
+            // Populate section dropdown
+            const select = document.getElementById('sectionSelect');
+            SECTIONS.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = s.name;
+                select.appendChild(opt);
+            });
+
+            renderStories();
+            renderPosts();
+        }
+
+        function renderStories() {
+            const featured = POSTS.filter(p => p.featured && p.approved);
+            const groupIds = [...new Set(featured.map(p => p.groupId))];
+            
+            document.getElementById('storiesContainer').innerHTML = groupIds.map(id => {
+                const g = getGroup(id);
+                if (!g) return '';
+                return `
+                    <div class="story-item" onclick="showProfile('${g.id}')">
+                        <div class="story-ring">
+                            <div class="story-avatar">${g.avatar}</div>
+                        </div>
+                        <span class="story-name">${g.name}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderPosts() {
+            let posts = POSTS.filter(p => p.approved);
+            
+            if (currentSection !== 'all') {
+                posts = posts.filter(p => p.sectionId === currentSection);
+            }
+            
+            if (currentFilter !== 'all') {
+                posts = posts.filter(p => p.hashtags.some(t => t.includes(currentFilter)));
+            }
+
+            // Sort: trending for all, recency for section
+            posts.sort((a, b) => currentSection === 'all' 
+                ? (b.likes + b.views) - (a.likes + a.views)
+                : new Date(b.createdAt) - new Date(a.createdAt)
+            );
+
+            const container = document.getElementById('postsContainer');
+            
+            if (posts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <div class="empty-state-title">No posts yet</div>
+                        <div class="empty-state-text">Be the first to share your analysis!</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = posts.map(post => {
+                const group = getGroup(post.groupId);
+                const section = getSection(post.sectionId);
+                if (!group) return '';
+
+                const isLiked = likedPosts.has(post.id);
+                const showBadge = currentSection === 'all';
+
+                let media = '';
+                if (post.type === 'text') {
+                    media = `
+                        <div class="post-media">
+                            <div class="post-media-text">
+                                <blockquote>"${post.quote}"</blockquote>
+                            </div>
+                            <span class="like-burst" id="burst-${post.id}">❤️</span>
+                        </div>
+                    `;
+                } else {
+                    media = `
+                        <div class="post-media" ondblclick="doubleTap('${post.id}')" style="background: var(--gradient-river); display: flex; align-items: center; justify-content: center;">
+                            <span style="font-size: 64px;">${post.thumbnailEmoji || '📄'}</span>
+                            ${post.type === 'video' ? '<div class="post-media-video-indicator">▶ Video</div>' : ''}
+                            <span class="like-burst" id="burst-${post.id}">❤️</span>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <article class="post">
+                        <div class="post-header">
+                            <div class="post-author" onclick="showProfile('${group.id}')">
+                                <div class="post-avatar">${group.avatar}</div>
+                                <div>
+                                    <div class="post-author-name">
+                                        ${group.name}
+                                        ${showBadge ? `<span class="post-section-badge">${section?.name.split(' - ')[0] || ''}</span>` : ''}
+                                    </div>
+                                    <div class="post-location">${group.theme}</div>
+                                </div>
+                            </div>
+                            <button class="post-menu">⋯</button>
+                        </div>
+                        ${media}
+                        <div class="post-actions">
+                            <div class="post-actions-left">
+                                <button class="action-btn" onclick="toggleLike('${post.id}')">${isLiked ? '❤️' : '🤍'}</button>
+                                <button class="action-btn" onclick="openComments('${post.id}')">💬</button>
+                                <button class="action-btn">📤</button>
+                            </div>
+                            <button class="action-btn">🔖</button>
+                        </div>
+                        <div class="post-stats">
+                            <div class="post-likes">${formatNum(post.likes + (isLiked ? 1 : 0))} likes · ${formatNum(post.views)} views</div>
+                        </div>
+                        <div class="post-caption">
+                            <strong>${group.name}</strong>
+                            ${post.caption}
+                            <br>${post.hashtags.map(t => `<span class="hashtag">#${t}</span>`).join(' ')}
+                        </div>
+                        ${post.comments.length ? `<div class="post-comments-preview"><span class="view-comments" onclick="openComments('${post.id}')">View all ${post.comments.length} comments</span></div>` : ''}
+                        <div class="post-time">${getTimeAgo(post.createdAt)}</div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        function renderProfile(groupId) {
+            const group = getGroup(groupId);
+            if (!group) return;
+
+            const section = getSection(group.sectionId);
+            const posts = POSTS.filter(p => p.groupId === groupId && p.approved);
+            const likes = posts.reduce((s, p) => s + p.likes, 0);
+            const views = posts.reduce((s, p) => s + p.views, 0);
+
+            document.getElementById('profileHeader').innerHTML = `
+                <button class="profile-back" onclick="showFeed()">← Back</button>
+                <div class="profile-top">
+                    <div class="profile-avatar-large">${group.avatar}</div>
+                    <div class="profile-stats">
+                        <div class="profile-stat"><div class="profile-stat-num">${posts.length}</div><div class="profile-stat-label">posts</div></div>
+                        <div class="profile-stat"><div class="profile-stat-num">${formatNum(likes)}</div><div class="profile-stat-label">likes</div></div>
+                        <div class="profile-stat"><div class="profile-stat-num">${formatNum(views)}</div><div class="profile-stat-label">views</div></div>
+                    </div>
+                </div>
+                <div class="profile-name">${group.name}</div>
+                <div class="profile-section">${section?.name || ''}</div>
+                <div class="profile-bio">${group.bio}</div>
+                <div class="profile-theme-tag">${group.theme}</div>
+                <div class="profile-members">👥 ${group.members.join(', ')}</div>
+            `;
+
+            document.getElementById('profileGrid').innerHTML = posts.map(p => 
+                p.type === 'text'
+                    ? `<div class="grid-item grid-item-text">"${(p.quote || p.caption).substring(0, 50)}..."</div>`
+                    : `<div class="grid-item" style="background: var(--gradient-river);"><span style="font-size: 32px;">${p.thumbnailEmoji || '📄'}</span></div>`
+            ).join('');
+        }
+
+        function renderDashboard() {
+            const approved = POSTS.filter(p => p.approved);
+            const pending = POSTS.filter(p => !p.approved);
+            const likes = approved.reduce((s, p) => s + p.likes, 0);
+            const views = approved.reduce((s, p) => s + p.views, 0);
+            const activeGroups = [...new Set(approved.map(p => p.groupId))].length;
+
+            document.getElementById('statPosts').textContent = approved.length;
+            document.getElementById('statEngagement').textContent = formatNum(likes + views);
+            document.getElementById('statGroups').textContent = activeGroups;
+            document.getElementById('statPending').textContent = pending.length;
+
+            // Pending
+            document.getElementById('pendingList').innerHTML = pending.length === 0
+                ? '<p style="color: var(--text-muted);">No pending submissions 🎉</p>'
+                : pending.map(p => {
+                    const g = getGroup(p.groupId);
+                    return `
+                        <div class="pending-item">
+                            <div class="pending-preview">${p.thumbnailEmoji || '📝'}</div>
+                            <div class="pending-info">
+                                <div class="pending-group">${g?.name || 'Unknown'}</div>
+                                <div class="pending-type">${p.type} · ${getTimeAgo(p.createdAt)}</div>
+                                ${p.feedback ? '<div style="font-size:11px;color:var(--accent);margin-top:4px;">Feedback sent</div>' : ''}
+                            </div>
+                            <div class="pending-actions">
+                                <button class="pending-btn review">Review</button>
+                                <button class="pending-btn approve">Approve</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            // Leaderboard
+            const stats = GROUPS.map(g => {
+                const gp = approved.filter(p => p.groupId === g.id);
+                return { ...g, engagement: gp.reduce((s, p) => s + p.likes + p.views, 0), posts: gp.length };
+            }).filter(g => g.posts > 0).sort((a, b) => b.engagement - a.engagement).slice(0, 5);
+
+            document.getElementById('leaderboard').innerHTML = stats.map((g, i) => `
+                <div class="leaderboard-item">
+                    <div class="leaderboard-rank ${['gold','silver','bronze'][i] || ''}">${i + 1}</div>
+                    <span class="leaderboard-avatar">${g.avatar}</span>
+                    <div class="leaderboard-info">
+                        <div class="leaderboard-name">${g.name}</div>
+                        <div class="leaderboard-stat">${formatNum(g.engagement)} engagement · ${g.posts} posts</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Sections
+            const secStats = SECTIONS.map(s => {
+                const sp = approved.filter(p => p.sectionId === s.id);
+                return { ...s, posts: sp.length, engagement: sp.reduce((sum, p) => sum + p.likes + p.views, 0) };
+            }).filter(s => s.posts > 0).sort((a, b) => b.engagement - a.engagement);
+
+            document.getElementById('sectionStats').innerHTML = secStats.map(s => `
+                <div class="leaderboard-item">
+                    <span class="leaderboard-avatar">📚</span>
+                    <div class="leaderboard-info">
+                        <div class="leaderboard-name">${s.name}</div>
+                        <div class="leaderboard-stat">${s.posts} posts · ${formatNum(s.engagement)} engagement</div>
+                    </div>
+                </div>
+            `).join('') || '<p style="color:var(--text-muted);">No data yet</p>';
+        }
+
+        // =====================================================
+        // INTERACTIONS
+        // =====================================================
+        function toggleLike(id) {
+            likedPosts.has(id) ? likedPosts.delete(id) : (likedPosts.add(id), triggerBurst(id));
+            renderPosts();
+        }
+
+        function doubleTap(id) {
+            if (!likedPosts.has(id)) { likedPosts.add(id); triggerBurst(id); renderPosts(); }
+        }
+
+        function triggerBurst(id) {
+            const el = document.getElementById(`burst-${id}`);
+            if (el) { el.classList.add('animate'); setTimeout(() => el.classList.remove('animate'), 700); }
+        }
+
+        function openComments(id) {
+            const post = POSTS.find(p => p.id === id);
+            if (!post) return;
+
+            document.getElementById('commentsContent').innerHTML = post.comments.length === 0
+                ? '<p style="color:var(--text-muted);text-align:center;padding:20px;">No comments yet</p>'
+                : post.comments.map(c => {
+                    const g = getGroup(c.groupId);
+                    return `
+                        <div class="comment-item">
+                            <div class="comment-avatar">${g?.avatar || '👤'}</div>
+                            <div class="comment-body">
+                                <span class="comment-author">${g?.name || 'Anon'}</span>
+                                <span class="comment-text">${c.text}</span>
+                                <div class="comment-time">${c.time}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            document.getElementById('commentsModal').classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function showSubmitInfo() {
+            document.getElementById('submitModal').classList.add('active');
+        }
+
+        function showAllGroups() {
+            document.getElementById('groupsListContent').innerHTML = GROUPS.map(g => {
+                const section = getSection(g.sectionId);
+                return `
+                    <div class="leaderboard-item" onclick="showProfile('${g.id}')" style="cursor:pointer;">
+                        <span class="leaderboard-avatar">${g.avatar}</span>
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name">${g.name}</div>
+                            <div class="leaderboard-stat">${section?.name || ''} · ${g.theme}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('groupsModal').classList.add('active');
+        }
+
+        // =====================================================
+        // NAVIGATION
+        // =====================================================
+        function showView(id) {
+            document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function showFeed() {
+            showView('feedView');
+            document.querySelectorAll('.nav-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
+        }
+
+        function showProfile(groupId) {
+            showView('profileView');
+            renderProfile(groupId);
+            closeModal('groupsModal');
+        }
+
+        function showDashboard() {
+            showView('dashboardView');
+            renderDashboard();
+            document.querySelectorAll('.nav-btn').forEach((b, i) => b.classList.toggle('active', i === 2));
+        }
+
+        function filterBySection() {
+            currentSection = document.getElementById('sectionSelect').value;
+            renderPosts();
+            renderStories();
+        }
+
+        // Filter tabs
+        document.getElementById('filterTabs').addEventListener('click', e => {
+            if (e.target.classList.contains('filter-tab')) {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                e.target.classList.add('active');
+                currentFilter = e.target.dataset.filter;
+                renderPosts();
+            }
+        });
+
+        // Close modals on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(m => {
+            m.addEventListener('click', e => {
+                if (e.target === m) m.classList.remove('active');
+            });
+        });
+
+        // Init
+        init();
+    </script>
+</body>
+</html>
